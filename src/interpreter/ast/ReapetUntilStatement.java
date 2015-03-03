@@ -5,30 +5,30 @@ import interpreter.ast.visitor.NodeVisitor;
 /**
  * Created by Thomas on 3-3-2015.
  */
-public class WhileStatement extends Statement{
+public class ReapetUntilStatement extends Statement {
 
     private final Expression condition;
-    private final Statement statement;
+    private final Statement body;
 
-    public WhileStatement(int lineIndex, int columnIndex, Expression condition, Statement statement) {
+    public ReapetUntilStatement(int lineIndex, int columnIndex, Expression condition, Statement body) {
         super(lineIndex, columnIndex);
         this.condition = condition;
-        this.statement = statement;
+        this.body = body;
     }
 
     public Expression getCondition() {
         return condition;
     }
 
-    public Statement getStatement() {
-        return statement;
+    public Statement getBody() {
+        return body;
     }
 
     @Override
     public String toString() {
-        return "WhileStatement{" +
+        return "doUntilStatement{" +
                 "condition=" + condition +
-                ", statement=" + statement +
+                ", body=" + body +
                 '}';
     }
 
@@ -36,4 +36,5 @@ public class WhileStatement extends Statement{
     public void visit(NodeVisitor visitor) {
 
     }
+
 }

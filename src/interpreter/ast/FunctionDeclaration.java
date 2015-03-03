@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 import java.util.ArrayList;
 
 /**
@@ -37,6 +39,11 @@ public class FunctionDeclaration extends Statement {
                 ", parameterNames=" + parameterNames +
                 ", body=" + body +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 
 }

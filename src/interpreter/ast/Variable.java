@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 /**
  * Created by Thomas on 2-3-2015.
  */
@@ -21,5 +23,10 @@ public class Variable extends Expression {
         return "Variable{" +
                 "variableName='" + variableName + '\'' +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

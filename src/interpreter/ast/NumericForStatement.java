@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 /**
  * Created by Thomas on 3-3-2015.
  */
@@ -42,5 +44,10 @@ public class NumericForStatement extends Statement {
                 ", step=" + step +
                 ", body=" + body +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

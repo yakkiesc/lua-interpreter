@@ -66,6 +66,7 @@ public class Lexer {
         registerKeyword("in", Token.IN);
         registerKeyword("goto", Token.GOTO);
         registerKeyword("for", Token.FOR);
+        registerKeyword("repeat", Token.REPEAT);
         registerKeyword("nil", Token.NIL_LITERAL);
 
         System.out.println("No duplicate keywords found.");
@@ -247,6 +248,8 @@ public class Lexer {
                     return Token.LABEL;
                 }
                 return Token.COLON;
+            case ';':
+                return Token.SEMICOLON;
             case '.':
                 if(accept('.')){
                     if(accept('.')){
@@ -316,6 +319,10 @@ public class Lexer {
             endOfFile = true;
             return 0;
         }
+    }
+
+    public void unConsume(final int amount){
+        consume(-amount);
     }
 
     /**

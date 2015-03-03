@@ -15,11 +15,25 @@ public class ParserTests {
         //doFunctionTest();
         //doIfTests();
         //doFunctionDeclTest();
-        doForTests();
+        //doForTests();
+        doTableConstructorTests();
     }
 
     private static void doForTests() {
         final String source = "function f(z) for i = z, 5 do a(i) end for y in m do end while x do y:z(e) end end";
+        final Lexer lexer = new Lexer(source);
+        final Parser parser = new Parser(lexer);
+        try {
+            System.out.println(parser.statement());
+        } catch (LexicalException e) {
+            e.printStackTrace();
+        } catch (SyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void doTableConstructorTests(){
+        final String source = "function s(a) s({[0]=3, [3]=2, r = f(x), z(e)}) end";
         final Lexer lexer = new Lexer(source);
         final Parser parser = new Parser(lexer);
         try {

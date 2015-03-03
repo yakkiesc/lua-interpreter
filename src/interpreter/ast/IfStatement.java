@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 /**
  * Created by Thomas on 2-3-2015.
  */
@@ -35,5 +37,10 @@ public class IfStatement extends Statement {
                 ", body=" + body +
                 ", elseStatement=" + elseStatement +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

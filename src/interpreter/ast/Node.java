@@ -1,9 +1,11 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 /**
  * Created by Thomas on 2-3-2015.
  */
-public class Node {
+public abstract class Node {
 
     private final int lineIndex;
     private final int columnIndex;
@@ -26,4 +28,7 @@ public class Node {
         return "lineIndex=" + lineIndex +
                 ", columnIndex=" + columnIndex;
     }
+
+    public abstract void visit(NodeVisitor visitor);
+
 }

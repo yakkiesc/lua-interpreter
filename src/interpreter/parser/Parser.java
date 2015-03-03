@@ -39,7 +39,54 @@ public class Parser {
     }
 
     private Expression expression() throws LexicalException, SyntaxException {
+        if(accept(Token.CURLY_BRACKET_OPEN)){
+            return tableConstructor();
+        }
         return conditional();
+    }
+
+    private Expression tableConstructor() throws SyntaxException, LexicalException {
+        ArrayList<Statement> statements = new ArrayList<Statement>();
+        final Variable table = new Variable(-1, -1, "tableconstructor");
+        while(!accept(Token.CURLY_BRACKET_CLOSE)) {
+            if (accept(Token.IDENTIFIER)) {
+                final String fieldName = currentToken.getLexeme();
+                Variable access = new Variable(-1, -1, fieldName);
+                VariableAccess variableAccess = new VariableAccess(-1, -1, table, access);
+                if(peekEquals(Token.ASSIGNMENT)) {
+                    expect(Token.ASSIGNMENT);
+                    Expression value = expression();
+                    final AssignmentStatement assignmentStatement = new AssignmentStatement(-1, -1, variableAccess, value);
+                    statements.add(assignmentStatement);
+                } else {
+                    //TODO:: refactor this.
+                    lexer.unConsume(fieldName.length());
+                    Expression expression = expression();
+                    Statement statement = new StatementExpression(-1, -1, expression);
+                    statements.add(statement);
+                }
+            } else if (accept(Token.BRACKET_OPEN)) {
+                final Expression index = expression();
+                expect(Token.BRACKET_CLOSE);
+                ArrayAccess arrayAccess = new ArrayAccess(-1, -1, table, index);
+                expect(Token.ASSIGNMENT);
+                Expression value = expression();
+                final AssignmentStatement assignmentStatement = new AssignmentStatement(-1, -1, arrayAccess, value);
+                statements.add(assignmentStatement);
+            } else {
+                Expression expression = expression();
+                Statement statement = new StatementExpression(-1, -1, expression);
+                statements.add(statement);
+            }
+            if(!accept(Token.COMMA)){
+                if(!accept(Token.SEMICOLON)){
+                    expect(Token.CURLY_BRACKET_CLOSE);
+                    break;
+                }
+            }
+        }
+
+        return createExpression(TableConstructor.class, statements);
     }
 
     /**
@@ -241,6 +288,8 @@ public class Parser {
             return forStatement();
         } else if(accept(Token.WHILE)){
             return whileStatement();
+        } else if(accept(Token.REPEAT)){
+            return repeatUntilStatement();
         }
 
         Expression expression = expression();
@@ -251,6 +300,34 @@ public class Parser {
 
         return createStatement(StatementExpression.class, expression);
     }
+
+    private Statement repeatUntilStatement() throws SyntaxException, LexicalException {
+        final Expression condition = expression();
+        final Statement body = untilBlock();
+        return createStatement(ReapetUntilStatement.class, condition, body);
+    }
+
+    private Statement untilBlock() throws LexicalException, SyntaxException {
+        final ArrayList<Statement> statements = new ArrayList<Statement>();
+        Expression returnValue = null;
+
+        while(!accept(Token.UNTIL)){
+            if(accept(Token.RETURN)){
+                expect(Token.UNTIL);
+                returnValue = expression();
+                break;
+            }
+            if(accept(Token.BREAK)){
+                expect(Token.UNTIL);
+                break;
+            }
+            final Statement statement = statement();
+            statements.add(statement);
+        }
+
+        return createStatement(Block.class, statements, returnValue);
+    }
+
 
     private Statement whileStatement() throws SyntaxException, LexicalException {
         final Expression condition = expression();
@@ -434,8 +511,16 @@ public class Parser {
     }
 
     private boolean accept(final int expectedTokenID) throws LexicalException {
-        if(lexer.peekToken().getID() == expectedTokenID){
+        if(peekEquals(expectedTokenID)){
             currentToken = lexer.getToken();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean peekEquals(final int expectedTokenID) throws LexicalException {
+        if(lexer.peekToken().getID() == expectedTokenID){
             return true;
         } else {
             return false;

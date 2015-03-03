@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 import java.util.ArrayList;
 
 /**
@@ -30,5 +32,10 @@ public class FunctionCall extends Expression {
                 "functionValue=" + functionValue +
                 ", arguments=" + arguments +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

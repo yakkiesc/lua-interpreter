@@ -7,17 +7,9 @@ import interpreter.ast.*;
  */
 public interface NodeVisitor {
 
-    public void visitArrayAccess (final ArrayAccess arrayAccess);
+    public void visitBinaryExpression(final int operator);
 
-    public void visitAssignmentStatement(final AssignmentStatement assignmentStatement);
-
-    public void visitBinaryExpression(final BinaryExpression binaryExpression);
-
-    public void visitBlock(final Block block);
-
-    public void visitFunctionCall(final FunctionCall functionCall);
-
-    public void visitFunctionDeclaration(final FunctionDeclaration functionDeclaration);
+    public void visitLiteral(final Object value, final int type);
 
 
 }

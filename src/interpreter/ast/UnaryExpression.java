@@ -1,5 +1,6 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
 import interpreter.lexer.Token;
 
 /**
@@ -37,6 +38,11 @@ public class UnaryExpression extends Expression {
                 "operator=" + Token.toString(operator) +
                 ", expression=" + expression +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 
 }

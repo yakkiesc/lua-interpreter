@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 import java.util.ArrayList;
 
 /**
@@ -38,5 +40,10 @@ public class IterativeForStatement extends Statement{
                 ", expressions=" + expressions +
                 ", body=" + body +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

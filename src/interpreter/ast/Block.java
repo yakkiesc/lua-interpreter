@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 import java.util.ArrayList;
 
 /**
@@ -35,5 +37,10 @@ public class Block extends Statement {
                 "statements=" + statements +
                 ", returnStatement=" + returnStatement +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

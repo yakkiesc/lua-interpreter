@@ -42,6 +42,7 @@ public class Token {
     public static final int POWER = 30;
     public static final int LABEL = 31;
     public static final int COLON = 32;
+    public static final int SEMICOLON = 33;
 
     /* keywords */
     public static final int IF = 40;
@@ -61,6 +62,7 @@ public class Token {
     public static final int GOTO = 54;
     public static final int RETURN = 55;
     public static final int IN = 56;
+    public static final int REPEAT = 57;
 
     private final int columnIndex;
 

@@ -1,5 +1,6 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
 import interpreter.lexer.Token;
 
 /**
@@ -47,5 +48,10 @@ public class Literal extends Expression {
                 "literalType=" + Token.toString(literalType) +
                 ", value=" + value +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+        visitor.visitLiteral(value, literalType);
     }
 }

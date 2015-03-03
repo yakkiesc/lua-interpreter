@@ -1,5 +1,7 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
+
 import java.util.ArrayList;
 
 /**
@@ -39,5 +41,10 @@ public class AssignmentStatement extends Statement {
                 "variables=" + variables +
                 ", values=" + values +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+
     }
 }

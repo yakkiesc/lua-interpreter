@@ -1,5 +1,6 @@
 package interpreter.ast;
 
+import interpreter.ast.visitor.NodeVisitor;
 import interpreter.lexer.Token;
 
 /**
@@ -46,5 +47,12 @@ public class BinaryExpression extends Expression {
                 ", operator=" + Token.toString(operator) +
                 ", rightExpression=" + rightExpression +
                 '}';
+    }
+
+    @Override
+    public void visit(NodeVisitor visitor) {
+        leftExpression.visit(visitor);
+        rightExpression.visit(visitor);
+        visitor.visitBinaryExpression(operator);
     }
 }
