@@ -8,7 +8,6 @@ import interpreter.lexer.Token;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -151,7 +150,7 @@ public class Parser {
                     expression = createExpression(ArrayAccess.class, expression, index);
                     continue;
                 }
-                if(accept(Token.COLON)){
+                if(accept(Token.COLON)){ // object calls: x:f(y) = x.f(x,y)
                     expect(Token.IDENTIFIER);
                     final String accessName = currentToken.getLexeme();
                     final Expression accessVariable = createExpression(Variable.class, accessName);
@@ -232,13 +231,64 @@ public class Parser {
         }
     }
 
+
     public Statement statement() throws LexicalException, SyntaxException {
         if(accept(Token.IF)){
             return ifStatement();
         } else if(accept(Token.FUNCTION)){
             return functionDeclaration();
+        } else if(accept(Token.FOR)){
+            return forStatement();
+        } else if(accept(Token.WHILE)){
+            return whileStatement();
         }
-        return null;
+
+        Expression expression = expression();
+
+        if(accept(Token.ASSIGNMENT)){
+
+        }
+
+        return createStatement(StatementExpression.class, expression);
+    }
+
+    private Statement whileStatement() throws SyntaxException, LexicalException {
+        final Expression condition = expression();
+        expect(Token.DO);
+        final Statement body = block();
+        return createStatement(WhileStatement.class, condition, body);
+    }
+
+    private Statement forStatement() throws SyntaxException, LexicalException {
+        expect(Token.IDENTIFIER);
+        final String initialVariableName = currentToken.getLexeme();
+        if(accept(Token.ASSIGNMENT)){ // numerical for loop
+            final Expression initialVariable = createExpression(Variable.class, initialVariableName);
+            final Expression value = expression();
+            final Statement var = createStatement(AssignmentStatement.class, initialVariable, value);
+            Expression limit, step;
+            limit = step = null;
+            if(accept(Token.COMMA)){
+                limit = expression();
+                if(accept(Token.COMMA)){
+                    step = expression();
+                }
+            }
+            expect(Token.DO);
+            final Statement body = block();
+            return createStatement(NumericForStatement.class, var, limit, step, body);
+        } else { // iterative for loop
+            ArrayList<String> nameList = new ArrayList<String>();
+            nameList.add(initialVariableName);
+            if(accept(Token.COMMA)) {
+                nameList.addAll(nameList());
+            }
+            expect(Token.IN);
+            final ArrayList<Expression> expressionsList = expressionList();
+            expect(Token.DO);
+            final Statement body = block();
+            return createStatement(IterativeForStatement.class, nameList, expressionsList, body);
+        }
     }
 
     private Statement ifStatement() throws SyntaxException, LexicalException {
@@ -273,54 +323,7 @@ public class Parser {
         return createStatement(IfStatement.class, null, elseBody, null);
     }
 
-    private Statement ifBody() throws LexicalException, SyntaxException {
-        Expression returnValue = null;
-        final ArrayList<Statement> statements = new ArrayList<Statement>();
-        while(!accept(Token.ELSE) && !accept(Token.ELSEIF) && !accept(Token.END)){
-            if(accept(Token.RETURN)){
-                returnValue = expression();
-                accept(Token.ELSE);
-                accept(Token.ELSEIF);
-                accept(Token.END);
-                break;
-            }
-            final Statement statement = statement();
-            statements.add(statement);
-        }
-        return createStatement(Block.class, statements, returnValue);
-    }
-
-    private Statement block(){
-        return null;
-    }
-
-    private Statement assignment(){
-        return null;
-    }
-
-    private Statement functionDeclaration() throws SyntaxException, LexicalException {
-        expect(Token.IDENTIFIER);
-        final String functionName = currentToken.getLexeme();
-        expect(Token.PARENTHESIS_OPEN);
-
-        final ArrayList<String> parameterNames = new ArrayList<String>();
-
-        while(true){
-            expect(Token.IDENTIFIER);
-            final String parameterName = currentToken.getLexeme();
-            parameterNames.add(parameterName);
-            if(accept(Token.PARENTHESIS_CLOSE)){
-               break;
-            }
-            expect(Token.COMMA);
-        }
-
-        final Statement functionBody = functionBody();
-
-        return createStatement(FunctionDeclaration.class, functionName, parameterNames, functionBody);
-    }
-
-    private Statement functionBody() throws SyntaxException, LexicalException {
+    private Statement block() throws LexicalException, SyntaxException {
         Expression returnValue = null;
         final ArrayList<Statement> statements = new ArrayList<Statement>();
         while(!accept(Token.END)){
@@ -332,6 +335,60 @@ public class Parser {
             statements.add(statement);
         }
         return createStatement(Block.class, statements, returnValue);
+    }
+
+    private Statement ifBody() throws LexicalException, SyntaxException {
+        Expression returnValue = null;
+        final ArrayList<Statement> statements = new ArrayList<Statement>();
+        while(!accept(Token.ELSE) && !accept(Token.ELSEIF) && !accept(Token.END)){
+            if(accept(Token.RETURN)){
+                returnValue = expression();
+                accept(Token.ELSE);
+                accept(Token.ELSEIF);
+                accept(Token.END);
+                break;
+            }
+            if(accept(Token.BREAK)){
+                accept(Token.ELSE);
+                accept(Token.ELSEIF);
+                accept(Token.END);
+                break;
+            }
+            final Statement statement = statement();
+            statements.add(statement);
+        }
+        return createStatement(Block.class, statements, returnValue);
+    }
+
+    private Statement assignment(){
+        return null;
+    }
+
+    private Statement functionDeclaration() throws SyntaxException, LexicalException {
+        expect(Token.IDENTIFIER);
+        final String functionName = currentToken.getLexeme();
+        expect(Token.PARENTHESIS_OPEN);
+
+        final ArrayList<String> parameterNames = nameList();
+
+        expect(Token.PARENTHESIS_CLOSE);
+
+        final Statement functionBody = block();
+
+        return createStatement(FunctionDeclaration.class, functionName, parameterNames, functionBody);
+    }
+
+    private ArrayList<String> nameList() throws SyntaxException, LexicalException {
+        final ArrayList<String> nameList = new ArrayList<String>();
+        while(true){
+            expect(Token.IDENTIFIER);
+            final String parameterName = currentToken.getLexeme();
+            nameList.add(parameterName);
+            if(!accept(Token.COMMA)){
+                break;
+            }
+        }
+        return nameList;
     }
 
     private Statement createStatement(final Class<? extends Statement> nodeType, final Object...arguments) {

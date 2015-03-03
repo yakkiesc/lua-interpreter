@@ -14,7 +14,21 @@ public class ParserTests {
         //doArithmeticTest();
         //doFunctionTest();
         //doIfTests();
-        doFunctionDeclTest();
+        //doFunctionDeclTest();
+        doForTests();
+    }
+
+    private static void doForTests() {
+        final String source = "function f(z) for i = z, 5 do a(i) end for y in m do end while x do y:z(e) end end";
+        final Lexer lexer = new Lexer(source);
+        final Parser parser = new Parser(lexer);
+        try {
+            System.out.println(parser.statement());
+        } catch (LexicalException e) {
+            e.printStackTrace();
+        } catch (SyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void doFunctionDeclTest() {
